@@ -1,0 +1,115 @@
+name: "Unified Deployment Pipeline"
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "README.md"
+      - "ARCHITECTURE.md"
+      - ".github/workflows/infra-destroy.yml"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+  TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+  TF_VAR_db_password: ${{ secrets.TF_VAR_DB_PASSWORD }}
+  TF_VAR_auth_secret: ${{ secrets.AUTH_SECRET }}
+  TF_VAR_google_client_id: ${{ secrets.GOOGLE_CLIENT_ID }}
+  TF_VAR_google_client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+  TF_VAR_initial_allowed_emails: ${{ secrets.INITIAL_ALLOWED_EMAILS }}
+  TF_VAR_gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+  TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
+  TF_VAR_auth_url: ${{ secrets.AUTH_URL }}
+
+jobs:
+  infrastructure:
+    name: "Infrastructure"
+    runs-on: ubuntu-latest
+    outputs:
+      bucket_name: ${{ steps.tf_outputs.outputs.bucket }}
+      codebuild_project: ${{ steps.tf_outputs.outputs.project }}
+    defaults:
+      run:
+        working-directory: ./terraform
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Path Filter
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            terraform:
+              - 'terraform/**'
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.GH_ROLE_ARN }}
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan & Apply
+        run: |
+          terraform plan -out=tfplan
+          terraform apply -auto-approve tfplan
+
+      - name: Get S3 Bucket and CodeBuild Project Name
+        id: tf_outputs
+        run: |
+          # Check if outputs exist or if infrastructure lacks a deployment
+          if ! terraform output > /dev/null 2>&1; then
+            echo "ERROR: Terraform state has no outputs. The infrastructure must be fully deployed before the app."
+            echo "Please run this workflow manually via the Actions tab to force an initial deployment."
+            exit 1
+          fi
+
+          BUCKET=$(terraform output -raw source_bucket_name 2>/dev/null || true)
+          PROJECT=$(terraform output -raw codebuild_project_name 2>/dev/null || true)
+          
+          if [ -z "$BUCKET" ] || [[ "$BUCKET" == *"No outputs found"* ]]; then
+             echo "ERROR: Valid outputs not found. Please trigger a manual deployment to build infrastructure first."
+             exit 1
+          fi
+
+          echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
+          echo "project=$PROJECT" >> $GITHUB_OUTPUT
+
+  application:
+    name: "Application"
+    needs: infrastructure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.GH_ROLE_ARN }}
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      - name: Create source.zip
+        run: |
+          zip -r source.zip . -x "node_modules/*" ".next/*" "terraform/*" ".git/*" "source.zip"
+
+      - name: Upload source.zip to S3
+        run: |
+          aws s3 cp source.zip s3://${{ needs.infrastructure.outputs.bucket_name }}/source.zip
+
+      - name: Trigger Build & Deploy
+        run: |
+          aws codebuild start-build --project-name ${{ needs.infrastructure.outputs.codebuild_project }}

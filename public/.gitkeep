@@ -1,0 +1,1 @@
+# Keep this folder for Docker build to pass even if no static assets are used.

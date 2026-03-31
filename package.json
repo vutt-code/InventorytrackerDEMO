@@ -1,0 +1,43 @@
+{
+  "name": "inventory-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "dev": "prisma generate && next dev",
+    "dev:sqlite": "prisma generate --schema=prisma/schema.sqlite.prisma && next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "seed": "ts-node prisma/seed.ts",
+    "push:sqlite": "prisma db push --schema=prisma/schema.sqlite.prisma",
+    "studio:sqlite": "prisma studio --schema=prisma/schema.sqlite.prisma"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@ai-sdk/google": "^3.0.53",
+    "@ai-sdk/react": "^3.0.143",
+    "@auth/prisma-adapter": "^2.11.1",
+    "@google/genai": "^1.47.0",
+    "@libsql/client": "^0.17.2",
+    "@prisma/adapter-libsql": "^7.5.0",
+    "@prisma/client": "^6.19.2",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "ai": "^6.0.141",
+    "next": "^16.2.0",
+    "next-auth": "^5.0.0-beta.30",
+    "prisma": "^6.19.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/better-sqlite3": "^7.6.13"
+  }
+}

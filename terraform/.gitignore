@@ -1,0 +1,11 @@
+# Terraform state and local files — never commit these
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+.terraform.lock.hcl
+
+# Sensitive variable files
+*.tfvars
+*.tfvars.json

@@ -1,0 +1,56 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+deployments.json
+
+# misc
+.DS_Store
+*.pem
+Thumbs.db
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# SQLite Database
+*.db
+*.db-journal
+dev.db
+
+
+cloud-sql-proxy.x64.exe
+GoogleCloudSDKInstaller.exe
+
+# IDEs and Editors
+.idea/
+.vscode/
+
+# Logs
+logs
+*.log

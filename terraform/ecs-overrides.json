@@ -1,0 +1,1 @@
+{"containerOverrides":[{"name":"inventory-app","command":["/bin/sh","-c","npx prisma@6 migrate deploy"]}]}
