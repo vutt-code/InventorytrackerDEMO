@@ -330,33 +330,6 @@ VPC: 10.0.0.0/16
 
 ## 6. Application Stack
 
-### Source Layout
-
-```text
-GCLI31pro_app/
-├── app/
-│   ├── actions.ts          # Protected Next.js Server Actions (CRUD)
-│   ├── page.tsx            # Main page (Server Component) with auth checks
-│   ├── layout.tsx          # Root layout
-│   ├── api/auth/           # Auth.js dynamic route handlers
-│   └── api/chat/           # SSE Streaming endpoint for Gemini Chatbot
-├── components/
-│   ├── ProductClient.tsx   # Client component (search, add, edit UI)
-│   ├── auth-components.tsx # Sign in / Sign out UI components
-│   └── ChatBox.tsx         # Dark mode floating AI chat client
-├── lib/
-│   └── prisma.ts           # Prisma client singleton
-├── prisma/
-│   ├── schema.prisma       # PSQL Data model (inc. Auth & Products)
-│   └── schema.sqlite.prisma# Local dev SQLite model
-├── terraform/              # All IaC Infrastructure
-├── auth.ts                 # Central Auth.js Configuration
-├── Google-OpenID-Setup.md  # Detailed setup manual for OAuth credentials
-├── GCP-Gemini-Setup.md     # Setup manual for Gemini API integration
-├── Dockerfile              # Multi-stage production build (copies ARCHITECTURE.md)
-└── ARCHITECTURE.md         # This file
-```
-
 ### Dockerfile — Build Stages
 
 | Stage      | Base Image        | Purpose                                    |
