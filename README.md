@@ -32,6 +32,8 @@ A full-stack **inventory tracking** web application that allows users to:
 - Delete products
 - **Consult the technical design via the integrated Architect AI Chatbot.**
 
+NOTE: While this app and CI/CD pipelines are fully working this public DEMO repo is meant to be as read only. In order to fully set it up GA Actions with secrets and Google Cloud APIs for login and AI chatbox needs to be set up
+
 | Attribute        | Value                                                                 |
 |------------------|-----------------------------------------------------------------------|
 | Framework        | Next.js 16 (App Router, Server Actions, Standalone output)            |
