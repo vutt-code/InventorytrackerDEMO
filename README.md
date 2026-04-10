@@ -414,6 +414,22 @@ The deployment workflow is automated using GitHub Actions, separated into two ma
   - Triggers the AWS CodeBuild project to build the image, run migrations, and update ECS.
 - **Required Secrets:** `GH_ROLE_ARN` (OIDC IAM Role ARN).
 
+#### Required GitHub Secrets
+
+To enable these workflows, the following secrets must be configured in the GitHub repository (`Settings > Secrets and variables > Actions`):
+
+| Secret Name | Description | Example / Note |
+|-------------|-------------|----------------|
+| `GH_ROLE_ARN` | IAM Role ARN for OIDC Authentication | `arn:aws:iam::123:role/github-oidc-role` |
+| `AWS_REGION` | Target AWS Region | `eu-north-1` |
+| `TF_VAR_DB_PASSWORD` | Master password for RDS PostgreSQL | Minimum 8 characters, no special `@:/` |
+| `DOMAIN_NAME` | Registered domain for the application | `inventory.example.com` |
+| `AUTH_URL` | Canonical URL for authentication | `https://inventory.example.com` |
+| `AUTH_SECRET` | Secret key for session encryption | Use `openssl rand -base64 33` |
+| `GOOGLE_CLIENT_ID` | Google OAuth 2.0 Client ID | Obtained from GCP Console |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth 2.0 Client Secret | Obtained from GCP Console |
+| `INITIAL_ALLOWED_EMAILS` | Emails authorized to log in | `user1@gmail.com,user2@gmail.com` |
+| `GEMINI_API_KEY` | API Key for Assistant chatbot | Obtained from Google AI Studio |
 ---
 
 ### Manual Deployment (Reference)
